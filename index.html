@@ -1011,4 +1011,113 @@ class Component extends DCLogic {
 </body>
 </html>
 
+<!-- ===== 報名表（串接 Google Sheet）===== -->
+<style>
+#yumu-signup{background:#fff;border-top:1px solid #D5DCD5;padding:56px 24px 72px;box-sizing:border-box;font-family:'Noto Sans TC','Noto Sans Thai',-apple-system,BlinkMacSystemFont,sans-serif;color:#191C1B}
+#yumu-signup *{box-sizing:border-box}
+#yumu-signup .ys-wrap{max-width:760px;margin:0 auto}
+#yumu-signup h2{margin:0 0 10px;font-family:'Noto Serif TC',serif;font-size:30px;font-weight:700;line-height:1.35}
+#yumu-signup .ys-lead{margin:0 0 28px;font-size:15px;line-height:1.7;color:#4E5A52}
+#yumu-signup .ys-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+#yumu-signup .ys-field{margin:0 0 18px}
+#yumu-signup label.ys-l,#yumu-signup .ys-l{display:block;margin:0 0 6px;font-size:14px;font-weight:700}
+#yumu-signup .ys-req{color:#B3261E;margin-left:2px}
+#yumu-signup select,#yumu-signup input[type=text],#yumu-signup input[type=email],#yumu-signup input[type=tel],#yumu-signup textarea{width:100%;min-height:46px;padding:10px 12px;border:1px solid #AEB8AF;border-radius:8px;background:#fff;font:inherit;font-size:16px;color:#191C1B}
+#yumu-signup select{appearance:auto}
+#yumu-signup textarea{min-height:120px;resize:vertical;line-height:1.6}
+#yumu-signup input:focus,#yumu-signup textarea:focus{outline:3px solid #9CC9B0;outline-offset:0;border-color:#0E5133}
+#yumu-signup fieldset{margin:0 0 18px;padding:0;border:0;min-width:0}
+#yumu-signup .ys-opts{display:flex;flex-wrap:wrap;gap:10px}
+#yumu-signup .ys-opt{display:flex;align-items:center;gap:8px;min-height:44px;padding:8px 14px;border:1px solid #AEB8AF;border-radius:999px;font-size:14px;cursor:pointer;background:#fff}
+#yumu-signup .ys-opt input{width:18px;height:18px;margin:0;accent-color:#0E5133}
+#yumu-signup .ys-opt:has(input:checked){background:#EEF2EC;border-color:#0E5133}
+#yumu-signup .ys-pdpa{margin:0 0 20px;padding:14px 16px;background:#EEF2EC;border-radius:10px;font-size:13px;line-height:1.7;color:#4E5A52}
+#yumu-signup .ys-agree{display:flex;align-items:flex-start;gap:10px;margin:0 0 22px;font-size:14px;line-height:1.6}
+#yumu-signup .ys-agree input{width:20px;height:20px;margin:2px 0 0;accent-color:#0E5133;flex:none}
+#yumu-signup button{min-height:48px;padding:0 32px;border:0;border-radius:999px;background:#0E5133;color:#fff;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+#yumu-signup button:hover{background:#0A3D27}
+#yumu-signup button:disabled{opacity:.6;cursor:wait}
+#yumu-signup .ys-msg{margin:16px 0 0;padding:12px 14px;border-radius:8px;font-size:14px;line-height:1.6;display:none}
+#yumu-signup .ys-msg.ok{display:block;background:#E3F1E8;color:#14452E}
+#yumu-signup .ys-msg.err{display:block;background:#FBE9E7;color:#8C1D18}
+#yumu-signup .ys-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+@media (max-width:640px){#yumu-signup{padding:40px 16px 56px}#yumu-signup h2{font-size:24px}#yumu-signup .ys-row{grid-template-columns:1fr;gap:0}}
+</style>
+<section id="yumu-signup" aria-labelledby="ys-title">
+<div class="ys-wrap">
+<h2 id="ys-title">培訓報名與試用洽詢</h2>
+<p class="ys-lead">想了解多語種 AI＋ESG 線上培訓、移工 DEI 合規認證，或安排試用與合作，請留下資料與需求。我們會依您填寫的聯絡方式回覆。</p>
+<form id="ys-form" novalidate>
+<div class="ys-row">
+<div class="ys-field"><label class="ys-l" for="ys-name">姓名<span class="ys-req">*</span></label><input type="text" id="ys-name" name="name" autocomplete="name" required></div>
+<div class="ys-field"><label class="ys-l" for="ys-org">公司／單位<span class="ys-req">*</span></label><input type="text" id="ys-org" name="org" autocomplete="organization" required></div>
+</div>
+<div class="ys-row">
+<div class="ys-field"><label class="ys-l" for="ys-title-in">職稱</label><input type="text" id="ys-title-in" name="title" autocomplete="organization-title"></div>
+<div class="ys-field"><label class="ys-l" for="ys-phone">電話</label><input type="tel" id="ys-phone" name="phone" autocomplete="tel"></div>
+</div>
+<div class="ys-field"><label class="ys-l" for="ys-email">Email<span class="ys-req">*</span></label><input type="email" id="ys-email" name="email" autocomplete="email" required></div>
+<div class="ys-row">
+<div class="ys-field"><label class="ys-l" for="ys-role">您的單位類型</label><select id="ys-role" name="role"><option value="">請選擇</option><option>製造業等雇主企業</option><option>人力仲介／服務公司</option><option>教育訓練單位</option><option>政府機關／公協會</option><option>其他</option></select></div>
+<div class="ys-field"><label class="ys-l" for="ys-size">預計參訓人數</label><select id="ys-size" name="size"><option value="">請選擇</option><option>10 人以下</option><option>11–50 人</option><option>51–200 人</option><option>200 人以上</option><option>尚未確定</option></select></div>
+</div>
+<fieldset class="ys-field"><legend class="ys-l">想了解的項目（可複選）</legend>
+<div class="ys-opts">
+<label class="ys-opt"><input type="checkbox" name="interest" value="AI＋ESG 線上培訓課程">AI＋ESG 線上培訓課程</label>
+<label class="ys-opt"><input type="checkbox" name="interest" value="移工 DEI 合規認證">移工 DEI 合規認證</label>
+<label class="ys-opt"><input type="checkbox" name="interest" value="試用／示範">試用／示範</label>
+<label class="ys-opt"><input type="checkbox" name="interest" value="合作洽談">合作洽談</label>
+</div></fieldset>
+<fieldset class="ys-field"><legend class="ys-l">需要的學習語言（可複選）</legend>
+<div class="ys-opts">
+<label class="ys-opt"><input type="checkbox" name="lang" value="華語">華語</label>
+<label class="ys-opt"><input type="checkbox" name="lang" value="English">English</label>
+<label class="ys-opt"><input type="checkbox" name="lang" value="ไทย">ไทย</label>
+<label class="ys-opt"><input type="checkbox" name="lang" value="其他語種">其他語種（請於下方說明）</label>
+</div></fieldset>
+<div class="ys-field"><label class="ys-l" for="ys-msgin">您的問題或需求（含其他語種需求）</label><textarea id="ys-msgin" name="message" maxlength="2000" placeholder="例如：現場職務、希望的上線時間、其他語種"></textarea></div>
+<div class="ys-hp" aria-hidden="true"><label>請勿填寫<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+<div class="ys-pdpa"><strong>個人資料告知</strong><br>您填寫的姓名、單位與聯絡方式，僅用於回覆您對本培訓平台與認證服務的報名、試用與提問，以及改善宇沐新創的內容與服務，不會用於其他目的，也不會提供給第三方。資料僅由宇沐新創有限公司指定人員查閱，保存期限至處理完畢後一年，屆時刪除。您可隨時來信 858377355@qq.com 查詢、更正或請求刪除。</div>
+<label class="ys-agree"><input type="checkbox" id="ys-agree" name="agree" value="是" required><span>我已閱讀並同意上述個人資料告知。<span class="ys-req">*</span></span></label>
+<button type="submit" id="ys-submit">送出報名</button>
+<div class="ys-msg" id="ys-msg" role="status" aria-live="polite"></div>
+</form>
+</div>
+</section>
+<script>
+(function(){
+  // 貼上 Apps Script「網頁應用程式」部署網址（以 /exec 結尾）
+  var ENDPOINT = 'https://script.google.com/macros/s/AKfycbysrDqvE3Xrh94vKw8IC99dv-W0UTKPgkCD1kCRrG6fQreI4_F0R8w5E0Vr8lV552DM/exec';
+  function mount(){
+    var sec=document.getElementById('yumu-signup'); if(!sec) return;
+    // 移到整頁最後（避開框架的版面）
+    if(sec.parentNode!==document.body||document.body.lastElementChild!==sec){
+      var st=sec.previousElementSibling; document.body.appendChild(sec);
+    }
+  }
+  mount(); window.addEventListener('load',function(){mount();setTimeout(mount,800)});
+  var form=document.getElementById('ys-form'),msg=document.getElementById('ys-msg'),btn=document.getElementById('ys-submit');
+  function show(t,c){msg.className='ys-msg '+c;msg.textContent=t}
+  form.addEventListener('submit',function(ev){
+    ev.preventDefault(); msg.className='ys-msg';
+    var f=form.elements, name=f.name.value.trim(), org=f.org.value.trim(), email=f.email.value.trim();
+    if(!name||!org||!email){show('請填寫姓名、公司／單位與 Email。','err');return}
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){show('Email 格式似乎不正確，請再確認。','err');return}
+    if(!f.agree.checked){show('請先勾選同意個人資料告知。','err');return}
+    if(f.website.value){show('已收到，謝謝您。','ok');form.reset();return}
+    if(ENDPOINT.indexOf('PASTE_')===0){show('報名表尚未完成串接，請先來信 858377355@qq.com 或使用 LINE 聯絡。','err');return}
+    var interests=[].map.call(form.querySelectorAll('input[name=interest]:checked'),function(i){return i.value}).join('、');
+    var p=new URLSearchParams();
+    p.set('name',name);p.set('org',org);p.set('title',f.title.value.trim());p.set('phone',f.phone.value.trim());
+    p.set('email',email);p.set('role',f.role.value);p.set('size',f.size.value);p.set('lang',[].map.call(form.querySelectorAll('input[name=lang]:checked'),function(i){return i.value}).join('、'));p.set('interest',interests);p.set('message',f.message.value.trim());p.set('agree','是');p.set('source',location.href);
+    btn.disabled=true;btn.textContent='送出中…';
+    fetch(ENDPOINT,{method:'POST',mode:'no-cors',body:p}).then(function(){
+      show('已收到您的報名，我們會盡快以您留下的聯絡方式回覆。謝謝您。','ok');form.reset();
+    }).catch(function(){
+      show('送出失敗，請檢查網路後再試，或來信 858377355@qq.com。','err');
+    }).then(function(){btn.disabled=false;btn.textContent='送出報名'});
+  });
+})();
+</script>
+<!-- ===== /報名表 ===== -->
 </body></html>
